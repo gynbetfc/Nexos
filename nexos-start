@@ -1,16 +1,13 @@
 #!/data/data/com.termux/files/usr/bin/bash
-
-# Mata processos antigos da porta 8080 ou conexões SSH presas
 pkill -f server_agent.py
 pkill -f "ssh -R"
 
 echo "🚀 INICIANDO SERVIDOR WEB INTERNO..."
-python /data/data/com.termux/files/home/.nexos/Nexos/agent/server_agent.py > /dev/null 2>&1 &
+python /data/data/com.termux/files/home/.nexos/Nexos/server_agent.py > /dev/null 2>&1 &
 
 sleep 2
 
 echo "🌐 ABRINDO TÚNEL PÚBLICO COM O SERVEO..."
-# Cria o link público e salva a url em um arquivo de log para você ler
 ssh -o StrictHostKeyChecking=no -R 80:localhost:8080 serveo.net > ~/.nexos_tunnel.log 2>&1 &
 
 sleep 4
@@ -20,5 +17,5 @@ echo "✅ SISTEMA DE PÉ E TRANSMITINDO!"
 echo "🆔 SEU ID DE SEGURANÇA: NX-51830E60"
 echo "------------------------------------------------"
 echo "👉 SEU LINK PÚBLICO GERADO É:"
-grep -o "https://[a-zA-Z0-9.]*serveo.net" ~/.nexos_tunnel.log || echo "Ainda gerando link... Aguarde 2s e rode: cat ~/.nexos_tunnel.log"
+grep -o "https://[a-zA-Z0-9.]*serveo.net" ~/.nexos_tunnel.log || echo "Ainda gerando... Rode: cat ~/.nexos_tunnel.log"
 echo "------------------------------------------------"
