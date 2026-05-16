@@ -16,41 +16,119 @@
 
 <div class="sidebar">
 
-<h1>NEXOS</h1>
+    <div>
+
+        <h1>NEXOS</h1>
+
+        <div class="menu">
+
+            <div class="menu-item active">
+                Dashboard
+            </div>
+
+            <div class="menu-item">
+                Devices
+            </div>
+
+            <div class="menu-item">
+                Cameras
+            </div>
+
+            <div class="menu-item">
+                GPS
+            </div>
+
+            <div class="menu-item">
+                Settings
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="version">
+        v1.0
+    </div>
 
 </div>
 
 <div class="main">
 
-<div class="topbar">
+    <div class="topbar">
 
-<input id="deviceId" placeholder="ENTER DEVICE ID">
+        <input id="deviceId" placeholder="ENTER DEVICE ID">
 
-<button onclick="connectDevice()">
-CONNECT
-</button>
+        <button onclick="connectDevice()">
+            CONNECT
+        </button>
 
-</div>
+        <div id="status" class="status offline">
+            OFFLINE
+        </div>
 
-<div class="grid">
+    </div>
 
-<div class="card">
-FRONT CAMERA
-</div>
+    <div class="grid">
 
-<div class="card">
-REAR CAMERA
-</div>
+        <div class="card">
 
-<div class="card">
-GPS
-</div>
+            <h2>DEVICE STATUS</h2>
 
-<div class="card">
-SCREEN STREAM
-</div>
+            <div class="device-online">
+                ● ONLINE
+            </div>
 
-</div>
+        </div>
+
+        <div class="card">
+
+            <h2>DEVICE INFO</h2>
+
+            <p>ID: <span id="deviceInfo">---</span></p>
+
+        </div>
+
+        <div class="card camera">
+
+            <h2>FRONT CAMERA</h2>
+
+            <div class="placeholder">
+                CAMERA STREAM
+            </div>
+
+        </div>
+
+        <div class="card camera">
+
+            <h2>REAR CAMERA</h2>
+
+            <div class="placeholder">
+                CAMERA STREAM
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <h2>GPS</h2>
+
+            <div class="placeholder">
+                MAP
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <h2>SCREEN STREAM</h2>
+
+            <div class="placeholder">
+                LIVE SCREEN
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
