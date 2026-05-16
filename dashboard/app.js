@@ -62,7 +62,7 @@ function connectDevice() {
                 }
 
                 const mapsBtn = document.getElementById("googleMapsBtn");
-                mapsBtn.href = `https://www.google.com/maps/search/?api=1&query=${d.lat},${d.lon}`;
+                mapsBtn.href = `https://www.google.com/maps?q=${d.lat},${d.lon}`;
                 mapsBtn.style.display = "block";
             }
 
