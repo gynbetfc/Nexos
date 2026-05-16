@@ -6,13 +6,17 @@ import os
 import subprocess
 
 SERVER = "wss://nexos-t0to.onrender.com/ws"
-ID_FILE = "device.id"
+# Definindo o caminho absoluto para nunca mais perder o arquivo de ID
+ID_FILE = "/data/data/com.termux/files/home/.nexos/Nexos/agent/device.id"
 
 def get_device_id():
     if os.path.exists(ID_FILE):
         with open(ID_FILE) as f:
             return f.read().strip()
-    device_id = "NX-" + str(uuid.uuid4())[:8].upper()
+    
+    # Se não existir, garante que a pasta existe e cria o ID padrão estável
+    os.makedirs(os.path.dirname(ID_FILE), exist_ok=True)
+    device_id = "NX-51830E60"
     with open(ID_FILE, "w") as f:
         f.write(device_id)
     return device_id
@@ -27,7 +31,6 @@ def get_system_info():
     lat = None
     lon = None
 
-    # 1. Coleta Bateria
     try:
         res = subprocess.run(["termux-battery-status"], capture_output=True, text=True, timeout=2)
         if res.returncode == 0:
@@ -36,7 +39,6 @@ def get_system_info():
     except Exception:
         pass
 
-    # 2. Coleta Armazenamento
     try:
         res = subprocess.run(["df", "-h", "/data/data/com.termux/files/home"], capture_output=True, text=True, timeout=2)
         if res.returncode == 0:
@@ -48,7 +50,6 @@ def get_system_info():
     except Exception:
         pass
 
-    # 3. Coleta Uptime
     try:
         res = subprocess.run(["uptime"], capture_output=True, text=True, timeout=2)
         if res.returncode == 0:
@@ -56,15 +57,14 @@ def get_system_info():
     except Exception:
         pass
 
-    # 4. Coleta GPS Blindada (Timeout curto de 3 segundos para nunca congelar o loop)
     try:
-        res = subprocess.run(["termux-location", "-p", "network", "-r", "once"], capture_output=True, text=True, timeout=3)
+        res = subprocess.run(["termux-location", "-p", "network"], capture_output=True, text=True, timeout=3)
         if res.returncode == 0:
             loc_data = json.loads(res.stdout)
             lat = loc_data.get("latitude")
             lon = loc_data.get("longitude")
     except Exception:
-        pass # Se falhar, ignora e envia o resto dos dados (bateria, etc)
+        pass
 
     return {
         "type": "status",
