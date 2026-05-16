@@ -16,6 +16,14 @@ function connectDevice() {
     if (!id) return;
 
     if (ws) ws.close();
+    
+    // Limpeza física do container do mapa se ele já existia antes do F5
+    if (map) {
+        map.remove();
+        map = null;
+        marker = null;
+    }
+
     ws = new WebSocket(SERVER);
 
     ws.onopen = () => {
@@ -59,9 +67,7 @@ function connectDevice() {
                     mapsBtn.style.display = "block";
                 }
             }
-        } catch(err) {
-            console.log(err);
-        }
+        } catch(err) { }
     };
     ws.onerror = () => setUiOffline();
     ws.onclose = () => setUiOffline();
