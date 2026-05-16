@@ -2,84 +2,67 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXOS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>NEXOS PANEL</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        /* Correções Mobile imediatas inline para garantir a responsividade do layout */
+        body { margin: 0; padding: 10px; background: #040a0f; color: #fff; font-family: sans-serif; }
+        .topbar-mobile { display: flex; gap: 8px; margin-bottom: 15px; }
+        .topbar-mobile input { flex: 1; background: #08131d; border: 1px solid #1e293b; padding: 12px; border-radius: 8px; color: #fff; font-size: 14px; }
+        .topbar-mobile button { background: #22c55e; border: none; padding: 0 16px; border-radius: 8px; color: #000; font-weight: bold; font-size: 13px; }
+        .card-container { display: flex; flex-direction: column; gap: 12px; }
+        .card-box { background: #08131d; border: 1px solid #1e293b; border-radius: 12px; padding: 15px; }
+        .card-box h2 { margin: 0 0 10px 0; font-size: 14px; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; }
+        .info-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #0f172a; font-size: 13px; }
+        .info-row span { color: #94a3b8; }
+        .info-row strong { color: #f8fafc; }
+        .map-box { height: 280px; border-radius: 8px; background: #020617; margin-top: 8px; z-index: 1; }
+        .btn-maps { display: none; background: #0284c7; color: #fff; text-align: center; padding: 10px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; margin-top: 10px; }
+        .cam-placeholder { height: 120px; display: flex; align-items: center; justify-content: center; border: 1px dashed #334155; border-radius: 8px; color: #475569; font-size: 12px; font-weight: bold; }
+    </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <div>
-        <h1>NEXOS</h1>
-        <div class="menu">
-            <div class="menu-item active">Dashboard</div>
-            <div class="menu-item">Devices</div>
-            <div class="menu-item">Cameras</div>
-            <div class="menu-item">GPS</div>
-            <div class="menu-item">Settings</div>
-        </div>
-    </div>
-    <div class="version">v1.0</div>
-</div>
-
-<div class="main">
-
-    <div class="topbar">
-        <input id="deviceId" placeholder="ENTER DEVICE ID">
-        <button id="status" class="status offline" onclick="connectDevice()">CONNECT</button>
+    <div class="topbar-mobile">
+        <input id="deviceId" placeholder="DEVICE ID">
+        <button id="status" onclick="connectDevice()">CONNECT</button>
     </div>
 
-    <div class="grid">
-
-        <div class="card">
-            <h2>DEVICE STATUS</h2>
-            <div id="statusIndicatorCard" class="device-online" style="color: #4ade80; font-weight: bold; margin-top: 15px;">
-                ● AGUARDANDO CONEXÃO
-            </div>
+    <div class="card-container">
+        <div class="card-box">
+            <h2>Device Status</h2>
+            <div id="statusIndicatorCard" style="color: #ef4444; font-weight: bold; font-size: 15px;">● DESCONECTADO</div>
         </div>
 
-        <div class="card">
-            <h2>DEVICE INFO</h2>
-            <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
-                <p><strong>ID:</strong> <span id="deviceInfo">---</span></p>
-                <p><strong>BATTERY:</strong> <span id="battery">---</span></p>
-                <p><strong>ANDROID:</strong> <span id="android">---</span></p>
-                <p><strong>STORAGE:</strong> <span id="storage">---</span></p>
-                <p><strong>UPTIME:</strong> <span id="uptime">---</span></p>
-            </div>
+        <div class="card-box">
+            <h2>Device Info</h2>
+            <div class="info-row"><span>ID:</span><strong id="deviceInfo">---</strong></div>
+            <div class="info-row"><span>Bateria:</span><strong id="battery">---</strong></div>
+            <div class="info-row"><span>Sistema:</span><strong id="android">---</strong></div>
+            <div class="info-row"><span>Espaço:</span><strong id="storage">---</strong></div>
+            <div class="info-row"><span>Uptime:</span><strong id="uptime">---</strong></div>
         </div>
 
-        <div class="card camera">
-            <h2>FRONT CAMERA</h2>
-            <div id="frontCameraContainer" class="placeholder">CAMERA STREAM OFF</div>
+        <div class="card-box">
+            <h2>GPS Localization</h2>
+            <div id="map" class="map-box"></div>
+            <a id="googleMapsBtn" href="#" target="_blank" class="btn-maps">ABRIR NO GOOGLE MAPS</a>
         </div>
 
-        <div class="card camera">
-            <h2>REAR CAMERA</h2>
-            <div id="rearCameraContainer" class="placeholder">CAMERA STREAM OFF</div>
+        <div class="card-box">
+            <h2>Front Camera</h2>
+            <div class="cam-placeholder">STREAM OFF</div>
         </div>
 
-        <div class="card" style="display: flex; flex-direction: column; height: 350px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h2>GPS LOCALIZATION</h2>
-                <a id="googleMapsBtn" href="#" target="_blank" style="display: none; background: #22d3ee; color: #000; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 12px; transition: .2s;">
-                    ABRIR NO GOOGLE MAPS
-                </a>
-            </div>
-            <div id="map" style="flex: 1; border-radius: 14px; background: #08131d; z-index: 1;"></div>
+        <div class="card-box">
+            <h2>Rear Camera</h2>
+            <div class="cam-placeholder">STREAM OFF</div>
         </div>
-
-        <div class="card">
-            <h2>SCREEN STREAM</h2>
-            <div id="screenContainer" class="placeholder">LIVE SCREEN OFF</div>
-        </div>
-
     </div>
 
-</div>
-
-<script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
