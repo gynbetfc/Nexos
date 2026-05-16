@@ -1,4 +1,4 @@
-const SERVER = "wss://YOUR-RENDER.onrender.com/ws"
+const SERVER = "wss://nexos-t0to.onrender.com/ws"
 
 function connectDevice(){
 
