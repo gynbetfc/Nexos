@@ -20,11 +20,22 @@ function connectDevice(){
 
         if(msg.status === "connected"){
 
-            alert("DEVICE ONLINE")
+            document.getElementById("status")
+            .className = "status online"
+
+            document.getElementById("status")
+            .innerText = "ONLINE"
+
+            document.getElementById("deviceInfo")
+            .innerText = id
 
         }else{
 
-            alert("DEVICE OFFLINE")
+            document.getElementById("status")
+            .className = "status offline"
+
+            document.getElementById("status")
+            .innerText = "OFFLINE"
         }
     }
 }
