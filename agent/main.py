@@ -4,7 +4,7 @@ import json
 import uuid
 import os
 
-SERVER = "wss://YOUR-RENDER.onrender.com/ws"
+SERVER = "wss://nexos-t0to.onrender.com/ws"
 
 ID_FILE = "device.id"
 
