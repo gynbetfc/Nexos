@@ -6,15 +6,12 @@ import os
 import subprocess
 
 SERVER = "wss://nexos-t0to.onrender.com/ws"
-# Definindo o caminho absoluto para nunca mais perder o arquivo de ID
 ID_FILE = "/data/data/com.termux/files/home/.nexos/Nexos/agent/device.id"
 
 def get_device_id():
     if os.path.exists(ID_FILE):
         with open(ID_FILE) as f:
             return f.read().strip()
-    
-    # Se não existir, garante que a pasta existe e cria o ID padrão estável
     os.makedirs(os.path.dirname(ID_FILE), exist_ok=True)
     device_id = "NX-51830E60"
     with open(ID_FILE, "w") as f:
@@ -57,8 +54,9 @@ def get_system_info():
     except Exception:
         pass
 
+    # Força requisição rápida baseada em redes parceiras, abortando em 2 segundos se falhar
     try:
-        res = subprocess.run(["termux-location", "-p", "network"], capture_output=True, text=True, timeout=3)
+        res = subprocess.run(["termux-location", "-p", "network", "-r", "once"], capture_output=True, text=True, timeout=2)
         if res.returncode == 0:
             loc_data = json.loads(res.stdout)
             lat = loc_data.get("latitude")
@@ -81,13 +79,11 @@ async def connect():
     while True:
         try:
             async with websockets.connect(SERVER) as ws:
-                print("CONECTADO:", DEVICE_ID)
                 while True:
                     payload = get_system_info()
                     await ws.send(json.dumps(payload))
                     await asyncio.sleep(15)
-        except Exception as e:
-            print("ERRO DE CONEXÃO RECONECTANDO EM 5S:", e)
+        except Exception:
             await asyncio.sleep(5)
 
 if __name__ == "__main__":
