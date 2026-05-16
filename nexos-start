@@ -1,24 +1,24 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-# Mata processos antigos para evitar portas presas
+# Mata processos antigos da porta 8080 ou conexões SSH presas
 pkill -f server_agent.py
-pkill -f ngrok
+pkill -f "ssh -R"
 
 echo "🚀 INICIANDO SERVIDOR WEB INTERNO..."
 python /data/data/com.termux/files/home/.nexos/Nexos/agent/server_agent.py > /dev/null 2>&1 &
 
 sleep 2
 
-echo "🌐 ABRINDO TÚNEL PÚBLICO VIA NGROK..."
-ngrok http 8080 > /dev/null 2>&1 &
+echo "🌐 ABRINDO TÚNEL PÚBLICO COM O SERVEO..."
+# Cria o link público e salva a url em um arquivo de log para você ler
+ssh -o StrictHostKeyChecking=no -R 80:localhost:8080 serveo.net > ~/.nexos_tunnel.log 2>&1 &
 
-sleep 3
+sleep 4
 
 echo "------------------------------------------------"
 echo "✅ SISTEMA DE PÉ E TRANSMITINDO!"
 echo "🆔 SEU ID DE SEGURANÇA: NX-51830E60"
 echo "------------------------------------------------"
-echo "Abra o aplicativo ou site do Ngrok para ver seu link"
-echo "ou use o comando temporário abaixo para capturar a URL gerada:"
-echo "curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url'"
+echo "👉 SEU LINK PÚBLICO GERADO É:"
+grep -o "https://[a-zA-Z0-9.]*serveo.net" ~/.nexos_tunnel.log || echo "Ainda gerando link... Aguarde 2s e rode: cat ~/.nexos_tunnel.log"
 echo "------------------------------------------------"
