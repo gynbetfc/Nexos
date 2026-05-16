@@ -16,14 +16,6 @@ function connectDevice() {
     if (!id) return;
 
     if (ws) ws.close();
-    
-    // Limpeza física do container do mapa se ele já existia antes do F5
-    if (map) {
-        map.remove();
-        map = null;
-        marker = null;
-    }
-
     ws = new WebSocket(SERVER);
 
     ws.onopen = () => {
@@ -34,8 +26,12 @@ function connectDevice() {
     ws.onmessage = (e) => {
         try {
             const msg = JSON.parse(e.data);
-            if (msg && msg.status === "connected") {
-                const d = msg.data;
+            
+            // Aceita tanto o sinal de conectado do broker quanto os dados diretos do bot
+            if (msg && (msg.status === "connected" || msg.type === "status")) {
+                
+                // Ajusta a leitura se o dado vier empacotado ou direto
+                const d = msg.data ? msg.data : msg;
 
                 const btn = document.getElementById("status");
                 btn.innerText = "DISCONNECT";
@@ -46,16 +42,16 @@ function connectDevice() {
                 document.getElementById("statusIndicatorCard").innerText = "● ONLINE";
                 document.getElementById("statusIndicatorCard").style.color = "#22c55e";
 
-                document.getElementById("deviceInfo").innerText = d.device_id || "---";
-                document.getElementById("battery").innerText = d.battery ? d.battery + "%" : "---";
-                document.getElementById("android").innerText = d.android || "---";
-                document.getElementById("storage").innerText = d.storage || "---";
-                document.getElementById("uptime").innerText = d.uptime || "---";
+                if (d.device_id) document.getElementById("deviceInfo").innerText = d.device_id;
+                if (d.battery && d.battery !== "N/A") document.getElementById("battery").innerText = d.battery + "%";
+                if (d.android) document.getElementById("android").innerText = d.android;
+                if (d.storage && d.storage !== "N/A") document.getElementById("storage").innerText = d.storage;
+                if (d.uptime && d.uptime !== "N/A") document.getElementById("uptime").innerText = d.uptime;
 
                 if (d.lat && d.lon) {
-                    const position = [d.lat, d.lon];
+                    const position = [parseFloat(d.lat), parseFloat(d.lon)];
                     if (!map) {
-                        map = L.map('map', { zoomControl: false }).setView(position, 15);
+                        map = L.map('map', { zoomControl: false }).setView(position, 16);
                         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
                         marker = L.marker(position).addTo(map);
                     } else {
@@ -67,7 +63,7 @@ function connectDevice() {
                     mapsBtn.style.display = "block";
                 }
             }
-        } catch(err) { }
+        } catch(err) { console.log(err); }
     };
     ws.onerror = () => setUiOffline();
     ws.onclose = () => setUiOffline();
