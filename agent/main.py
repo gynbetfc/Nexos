@@ -27,6 +27,7 @@ def get_system_info():
     lat = None
     lon = None
 
+    # 1. Coleta Bateria
     try:
         res = subprocess.run(["termux-battery-status"], capture_output=True, text=True, timeout=2)
         if res.returncode == 0:
@@ -35,6 +36,7 @@ def get_system_info():
     except Exception:
         pass
 
+    # 2. Coleta Armazenamento
     try:
         res = subprocess.run(["df", "-h", "/data/data/com.termux/files/home"], capture_output=True, text=True, timeout=2)
         if res.returncode == 0:
@@ -46,6 +48,7 @@ def get_system_info():
     except Exception:
         pass
 
+    # 3. Coleta Uptime
     try:
         res = subprocess.run(["uptime"], capture_output=True, text=True, timeout=2)
         if res.returncode == 0:
@@ -53,14 +56,15 @@ def get_system_info():
     except Exception:
         pass
 
+    # 4. Coleta GPS Blindada (Timeout curto de 3 segundos para nunca congelar o loop)
     try:
-        res = subprocess.run(["termux-location", "-p", "network"], capture_output=True, text=True, timeout=5)
+        res = subprocess.run(["termux-location", "-p", "network", "-r", "once"], capture_output=True, text=True, timeout=3)
         if res.returncode == 0:
             loc_data = json.loads(res.stdout)
             lat = loc_data.get("latitude")
             lon = loc_data.get("longitude")
     except Exception:
-        pass
+        pass # Se falhar, ignora e envia o resto dos dados (bateria, etc)
 
     return {
         "type": "status",
