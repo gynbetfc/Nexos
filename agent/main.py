@@ -20,15 +20,14 @@ def get_device_id():
 DEVICE_ID = get_device_id()
 
 def get_system_info():
-    """Coleta dados reais do Android usando o Termux API"""
-    # Valores padrão caso falte alguma permissão no Termux
     battery = "N/A"
     android_version = "Android"
     storage_info = "N/A"
     uptime_info = "N/A"
+    lat = None
+    lon = None
 
     try:
-        # Coleta bateria
         res = subprocess.run(["termux-battery-status"], capture_output=True, text=True, timeout=2)
         if res.returncode == 0:
             data = json.loads(res.stdout)
@@ -37,22 +36,29 @@ def get_system_info():
         pass
 
     try:
-        # Coleta armazenamento interno disponível na Home do Termux
         res = subprocess.run(["df", "-h", "/data/data/com.termux/files/home"], capture_output=True, text=True, timeout=2)
         if res.returncode == 0:
             lines = res.stdout.split("\n")
             if len(lines) > 1:
                 parts = [p for p in lines[1].split(" ") if p]
                 if len(parts) >= 3:
-                    storage_info = f"{parts[3]} livres" # Espaço disponível
+                    storage_info = f"{parts[3]} livres"
     except Exception:
         pass
 
     try:
-        # Coleta Uptime do sistema
         res = subprocess.run(["uptime"], capture_output=True, text=True, timeout=2)
         if res.returncode == 0:
             uptime_info = res.stdout.strip().split(",")[0].replace("up", "").strip()
+    except Exception:
+        pass
+
+    try:
+        res = subprocess.run(["termux-location", "-p", "network"], capture_output=True, text=True, timeout=5)
+        if res.returncode == 0:
+            loc_data = json.loads(res.stdout)
+            lat = loc_data.get("latitude")
+            lon = loc_data.get("longitude")
     except Exception:
         pass
 
@@ -62,28 +68,22 @@ def get_system_info():
         "battery": battery,
         "android": android_version,
         "storage": storage_info,
-        "uptime": uptime_info
+        "uptime": uptime_info,
+        "lat": lat,
+        "lon": lon
     }
 
 async def connect():
     while True:
         try:
-            print(f"Tentando conectar ao servidor: {SERVER}")
             async with websockets.connect(SERVER) as ws:
                 print("CONECTADO:", DEVICE_ID)
-                
                 while True:
-                    # Coleta as informações atualizadas do dispositivo
                     payload = get_system_info()
-                    
-                    # Envia os dados estruturados como 'status' para o servidor salvar
                     await ws.send(json.dumps(payload))
-                    
-                    # Intervalo de atualização (ajuste para não sobrecarregar)
                     await asyncio.sleep(15)
-                    
         except Exception as e:
-            print("ERRO DE CONEXÃO:", e)
+            print("ERRO DE CONEXÃO RECONECTANDO EM 5S:", e)
             await asyncio.sleep(5)
 
 if __name__ == "__main__":
