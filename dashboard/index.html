@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXOS</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
-
 <body>
 
 <div class="sidebar">
@@ -27,16 +27,15 @@
 <div class="main">
 
     <div class="topbar">
-        <input id="deviceId" placeholder="ENTER DEVICE ID (Ex: NX-A1B2C3D4)">
-        <button onclick="connectDevice()">CONNECT</button>
-        <div id="status" class="status offline">OFFLINE</div>
+        <input id="deviceId" placeholder="ENTER DEVICE ID">
+        <button id="status" class="status offline" onclick="connectDevice()">CONNECT</button>
     </div>
 
     <div class="grid">
 
         <div class="card">
             <h2>DEVICE STATUS</h2>
-            <div id="statusIndicator" class="device-online" style="color: #4ade80; font-weight: bold; margin-top: 15px;">
+            <div id="statusIndicatorCard" class="device-online" style="color: #4ade80; font-weight: bold; margin-top: 15px;">
                 ● AGUARDANDO CONEXÃO
             </div>
         </div>
@@ -54,30 +53,27 @@
 
         <div class="card camera">
             <h2>FRONT CAMERA</h2>
-            <div id="frontCameraContainer" class="placeholder">
-                CAMERA STREAM OFF
-            </div>
+            <div id="frontCameraContainer" class="placeholder">CAMERA STREAM OFF</div>
         </div>
 
         <div class="card camera">
             <h2>REAR CAMERA</h2>
-            <div id="rearCameraContainer" class="placeholder">
-                CAMERA STREAM OFF
-            </div>
+            <div id="rearCameraContainer" class="placeholder">CAMERA STREAM OFF</div>
         </div>
 
-        <div class="card">
-            <h2>GPS LOCALIZATION</h2>
-            <div id="gpsContainer" class="placeholder">
-                MAP NOT INITIALIZED
+        <div class="card" style="display: flex; flex-direction: column; height: 350px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2>GPS LOCALIZATION</h2>
+                <a id="googleMapsBtn" href="#" target="_blank" style="display: none; background: #22d3ee; color: #000; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 12px; transition: .2s;">
+                    ABRIR NO GOOGLE MAPS
+                </a>
             </div>
+            <div id="map" style="flex: 1; border-radius: 14px; background: #08131d; z-index: 1;"></div>
         </div>
 
         <div class="card">
             <h2>SCREEN STREAM</h2>
-            <div id="screenContainer" class="placeholder">
-                LIVE SCREEN OFF
-            </div>
+            <div id="screenContainer" class="placeholder">LIVE SCREEN OFF</div>
         </div>
 
     </div>
@@ -85,6 +81,5 @@
 </div>
 
 <script src="app.js"></script>
-
 </body>
 </html>
