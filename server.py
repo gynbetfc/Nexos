@@ -7,7 +7,7 @@ app = FastAPI()
 devices = {}
 
 @app.websocket("/ws")
-async def websocket_endpoint(ws: WebSocket):
+async def websocket(ws: WebSocket):
 
     await ws.accept()
 
@@ -16,20 +16,26 @@ async def websocket_endpoint(ws: WebSocket):
         while True:
 
             data = await ws.receive_text()
+
             msg = json.loads(data)
 
-            if msg["type"] == "device":
+            # DEVICE STATUS UPDATE
+            if msg["type"] == "status":
 
-                devices[msg["device_id"]] = ws
+                devices[msg["device_id"]] = msg
 
-                print("[DEVICE ONLINE]", msg["device_id"])
+                print("STATUS:", msg["device_id"])
 
+            # DASHBOARD REQUEST
             elif msg["type"] == "dashboard":
 
-                if msg["device_id"] in devices:
+                device_id = msg["device_id"]
+
+                if device_id in devices:
 
                     await ws.send_text(json.dumps({
-                        "status":"connected"
+                        "status":"connected",
+                        "data":devices[device_id]
                     }))
 
                 else:
@@ -38,8 +44,9 @@ async def websocket_endpoint(ws: WebSocket):
                         "status":"offline"
                     }))
 
-    except:
-        pass
+    except Exception as e:
+
+        print(e)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=10000)
